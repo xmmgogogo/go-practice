@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 var (
-	inputL = make(chan string, 2)
+	inputL = make(chan string, 3)
 	//outPutL = make(chan string, 2)
 )
 
@@ -16,6 +17,10 @@ func main() {
 	//fmt.Println(count1(list))
 	//sliceChar()
 	fmt.Println(count2(list))
+
+	//for {
+	//	time.Sleep(time.Millisecond * 500)
+	//}
 }
 
 func count2(items []string) (res map[string]int) {
@@ -25,6 +30,7 @@ func count2(items []string) (res map[string]int) {
 	go func() {
 		for _, v := range items {
 			inputL <- v
+			fmt.Println("写入：", v)
 		}
 		close(inputL)
 	}()
@@ -33,10 +39,13 @@ func count2(items []string) (res map[string]int) {
 	for {
 		// 这一行很重要，如果通道关闭了，则直接退出for循环即可
 		if getOne, isOk := <-inputL; isOk {
+			//go func() {
 			fmt.Println("读取到一个值", getOne)
 			for _, v := range getOne {
 				res[string(v)]++
 			}
+			time.Sleep(time.Millisecond * 1000)
+			//}()
 		} else {
 			break
 		}
